@@ -1,0 +1,14 @@
+﻿{
+  "name": "ca.sgmerriam.byteforge",
+  "version": "1.0",
+  "displayName": "ByteForge",
+  "description": "Collection of custom Unity tools and editor extensions",
+  "unity": "6.0",
+  "dependencies": {},
+  "keywords": ["tools", "editor", "extensions"],
+  "author": {
+    "name": "Stephen Merriam",
+    "email": "admin@sgmerriam.ca",
+    "url": "https://sgmerriam.ca"
+  }
+}
