@@ -1,6 +1,6 @@
 ﻿{
   "name": "ca.sgmerriam.byteforge",
-  "version": "1.0",
+  "version": "1.0.0",
   "displayName": "ByteForge",
   "description": "Collection of custom Unity tools and editor extensions",
   "unity": "6.0",
