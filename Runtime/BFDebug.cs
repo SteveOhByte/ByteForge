@@ -82,7 +82,6 @@ namespace ByteForge.Runtime
         private static bool includeCategory = true;
         private static bool includeThreadId = false;
         private static bool stackTraceForErrors = true;
-        private static bool useColours = true;
         private static bool logEnabled = true;
         private static bool asyncFileLogging = true;
         private static bool writeToPlayerLog = true;
@@ -99,17 +98,6 @@ namespace ByteForge.Runtime
         private static Thread logThread = null;
         private static bool logThreadRunning = false;
         private static AutoResetEvent logSignal = new(false);
-
-        // Log message formatting
-        private static Dictionary<LogLevel, string> logLevelColours = new()
-        {
-            { LogLevel.TRACE, "<colour=#AAAAAA>" }, // Gray
-            { LogLevel.DEBUG, "<colour=#FFFFFF>" }, // White
-            { LogLevel.INFO, "<colour=#00FF00>" }, // Green
-            { LogLevel.WARNING, "<colour=#FFFF00>" }, // Yellow
-            { LogLevel.ERROR, "<colour=#FF8000>" }, // Orange
-            { LogLevel.CRITICAL, "<colour=#FF0000>" } // Red
-        };
 
         // Performance tracking
         private static DateTime lastPerformanceLog = DateTime.MinValue;
@@ -476,14 +464,13 @@ namespace ByteForge.Runtime
         /// </summary>
         public static void ConfigureLogFormat(bool includeTimestamp, bool includeLogLevel,
             bool includeCategory, bool includeThreadId,
-            bool stackTraceForErrors, bool useColours)
+            bool stackTraceForErrors)
         {
             BFDebug.includeTimestamp = includeTimestamp;
             BFDebug.includeLogLevel = includeLogLevel;
             BFDebug.includeCategory = includeCategory;
             BFDebug.includeThreadId = includeThreadId;
             BFDebug.stackTraceForErrors = stackTraceForErrors;
-            BFDebug.useColours = useColours;
         }
 
         /// <summary>
@@ -769,10 +756,6 @@ namespace ByteForge.Runtime
         {
             StringBuilder sb = new();
 
-            // Start colour if using them and in console
-            if (forConsole && useColours)
-                sb.Append(logLevelColours[msg.Level]);
-
             // Add timestamp
             if (includeTimestamp)
                 sb.Append($"[{msg.Timestamp:yyyy-MM-dd HH:mm:ss.fff}] ");
@@ -799,10 +782,6 @@ namespace ByteForge.Runtime
                 sb.Append("Stack Trace:");
                 sb.AppendLine(msg.StackTrace);
             }
-
-            // End colour if using them and in console
-            if (forConsole && useColours)
-                sb.Append("</colour>");
 
             return sb.ToString();
         }

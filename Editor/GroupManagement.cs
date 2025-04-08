@@ -94,8 +94,7 @@ namespace ByteForge.Editor
         /// </summary>
         private Dictionary<string, Dictionary<string, List<SerializedProperty>>> GroupPropertiesByTabs()
         {
-            Dictionary<string, Dictionary<string, List<SerializedProperty>>> result =
-                new Dictionary<string, Dictionary<string, List<SerializedProperty>>>();
+            Dictionary<string, Dictionary<string, List<SerializedProperty>>> result = new();
 
             SerializedProperty iterator = serializedObject.GetIterator();
             bool enterChildren = true;
@@ -131,7 +130,7 @@ namespace ByteForge.Editor
         /// </summary>
         private Dictionary<string, List<SerializedProperty>> GetNonTabProperties()
         {
-            Dictionary<string, List<SerializedProperty>> result = new Dictionary<string, List<SerializedProperty>>();
+            Dictionary<string, List<SerializedProperty>> result = new();
 
             SerializedProperty iterator = serializedObject.GetIterator();
             bool enterChildren = true;
@@ -211,7 +210,7 @@ namespace ByteForge.Editor
         private Dictionary<string, List<SerializedProperty>> GroupPropertiesByGroupBox(
             List<SerializedProperty> properties)
         {
-            Dictionary<string, List<SerializedProperty>> result = new Dictionary<string, List<SerializedProperty>>();
+            Dictionary<string, List<SerializedProperty>> result = new();
 
             foreach (SerializedProperty property in properties)
             {
@@ -264,7 +263,7 @@ namespace ByteForge.Editor
         private Dictionary<string, List<SerializedProperty>> GroupPropertiesByFoldout(
             List<SerializedProperty> properties)
         {
-            Dictionary<string, List<SerializedProperty>> result = new Dictionary<string, List<SerializedProperty>>();
+            Dictionary<string, List<SerializedProperty>> result = new();
 
             foreach (SerializedProperty property in properties)
             {
