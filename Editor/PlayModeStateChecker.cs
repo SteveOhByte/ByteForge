@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR // Ensure this code is only compiled and used in the editor, not in builds
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using ByteForge.Runtime;
@@ -10,11 +11,25 @@ using UnityEngine.SceneManagement;
 namespace ByteForge.Editor
 {
     /// <summary>
-    /// Checks for missing required objects when entering play mode.
+    /// Editor utility that checks for missing required components before entering play mode.
     /// </summary>
+    /// <remarks>
+    /// This class automatically initializes when the editor loads and subscribes to
+    /// Unity's play mode state change events. When the user attempts to enter play mode,
+    /// it checks for any object references marked with the [Required] attribute that
+    /// haven't been assigned, preventing play mode and displaying an error message.
+    /// </remarks>
     [InitializeOnLoad]
+    [SuppressMessage("Domain reload", "UDR0001:Domain Reload Analyzer")]
     public class PlayModeStateChecker
     {
+        /// <summary>
+        /// Static constructor that subscribes to the play mode state changed event.
+        /// </summary>
+        /// <remarks>
+        /// The [InitializeOnLoad] attribute ensures this constructor is called when
+        /// the editor loads, setting up the play mode validation.
+        /// </remarks>
         static PlayModeStateChecker()
         {
             EditorApplication.playModeStateChanged +=
@@ -22,9 +37,15 @@ namespace ByteForge.Editor
         }
 
         /// <summary>
-        /// Returns a list of all missing required objects in all open scenes.
+        /// Finds all objects with missing required references in all open scenes.
         /// </summary>
-        /// <returns>A list of all missing required objects in all open scenes.</returns>
+        /// <returns>A list of strings describing each missing required reference.</returns>
+        /// <remarks>
+        /// Uses reflection to find all fields marked with the [Required] attribute,
+        /// then checks if any of these fields have null references. For each missing
+        /// reference, returns a descriptive string with the GameObject name, Component type,
+        /// and field name.
+        /// </remarks>
         private static List<string> GetMissingRequiredObjects()
         {
             return (from rootGameObject in GetAllRootGameObjectsInAllOpenScenes()
@@ -43,6 +64,15 @@ namespace ByteForge.Editor
                 .ToList();
         }
 
+        /// <summary>
+        /// Handles play mode state changes and validates required references.
+        /// </summary>
+        /// <param name="state">The current play mode state change.</param>
+        /// <remarks>
+        /// When exiting edit mode (about to enter play mode), checks for missing
+        /// required references and prevents play mode if any are found, displaying
+        /// an error dialog with details about the missing references.
+        /// </remarks>
         private static void OnPlayModeStateChanged(PlayModeStateChange state)
         {
             // Detect if about to enter play mode.
@@ -69,9 +99,14 @@ namespace ByteForge.Editor
         }
 
         /// <summary>
-        /// Returns all root game objects in all open scenes.
+        /// Gets all root GameObjects from all currently open scenes.
         /// </summary>
-        /// <returns>All root game objects in all open scenes.</returns>
+        /// <returns>An enumerable of all root GameObjects in all open scenes.</returns>
+        /// <remarks>
+        /// Uses Unity's SceneManager to iterate through all open scenes and collect
+        /// their root GameObjects. This is used as the starting point for searching
+        /// all objects in the scene hierarchy.
+        /// </remarks>
         private static IEnumerable<GameObject> GetAllRootGameObjectsInAllOpenScenes()
         {
             // Loop through all open scenes.

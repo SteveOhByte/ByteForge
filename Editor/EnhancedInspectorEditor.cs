@@ -11,31 +11,81 @@ using UnityEngine;
 namespace Editor
 {
     /// <summary>
-    /// Enhanced inspector that combines button functionality, notes system, and property grouping features.
+    /// Enhanced Unity inspector that combines button functionality, notes system, and property grouping features.
     /// </summary>
+    /// <remarks>
+    /// This custom editor extends Unity's default inspector for all MonoBehaviours with three main features:
+    /// 1. Button System - Allows method execution directly from the inspector using attributes
+    /// 2. Notes System - Enables developers to attach persistent notes to components
+    /// 3. Group Management - Supports organizing properties into tabs, groups, and foldouts
+    /// 
+    /// The editor automatically detects which features are applicable for each component
+    /// and displays the relevant controls.
+    /// </remarks>
     [CustomEditor(typeof(MonoBehaviour), true)]
     public class EnhancedInspectorEditor : UnityEditor.Editor
     {
         #region Private Fields
 
-        // Button System
+        /// <summary>
+        /// Cache of methods marked with button attributes in the target component.
+        /// </summary>
         private List<ButtonComponents.MethodCache> buttonMethods = new();
 
-        // Notes System
+        /// <summary>
+        /// EditorPrefs key prefix for storing note foldout states.
+        /// </summary>
         private const string FoldoutPrefsKey = "InspectorNotes_Foldout_";
+        
+        /// <summary>
+        /// The current content of the note for this component.
+        /// </summary>
         private string currentNote = string.Empty;
+        
+        /// <summary>
+        /// Whether the note editing field is currently displayed.
+        /// </summary>
         private bool showNoteField = false;
+        
+        /// <summary>
+        /// The scroll position for the note display area.
+        /// </summary>
         private Vector2 scrollPos;
+        
+        /// <summary>
+        /// Reference to the asset containing all saved notes.
+        /// </summary>
         private InspectorNotesData notesData;
+        
+        /// <summary>
+        /// Whether the notes section is expanded in the inspector.
+        /// </summary>
         private bool noteSectionExpanded;
 
-        // Group Management System
+        /// <summary>
+        /// Dictionary tracking the currently selected tab in each tab group.
+        /// </summary>
         private Dictionary<string, int> tabGroups = new();
+        
+        /// <summary>
+        /// Dictionary tracking the expanded/collapsed state of each foldout group.
+        /// </summary>
         private Dictionary<string, bool> foldoutStates = new();
+        
+        /// <summary>
+        /// The drawer responsible for handling grouped properties display.
+        /// </summary>
         private GroupDrawer groupDrawer;
 
         #endregion
 
+        /// <summary>
+        /// Initializes the editor when it becomes enabled.
+        /// </summary>
+        /// <remarks>
+        /// This method caches button methods, sets up the notes system,
+        /// and initializes the group drawer for organizing properties.
+        /// </remarks>
         private void OnEnable()
         {
             // Cache button methods
@@ -48,6 +98,17 @@ namespace Editor
             groupDrawer = new(serializedObject);
         }
 
+        /// <summary>
+        /// Draws the custom inspector GUI.
+        /// </summary>
+        /// <remarks>
+        /// This method handles the rendering of the entire inspector, including:
+        /// - Standard or grouped property fields
+        /// - Button controls for method execution
+        /// - Notes system interface
+        /// 
+        /// Each section is drawn only if relevant for the current component.
+        /// </remarks>
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -77,6 +138,18 @@ namespace Editor
 
         #region Button Methods
 
+        /// <summary>
+        /// Draws the button controls for methods marked with button attributes.
+        /// </summary>
+        /// <remarks>
+        /// For each method with a button attribute, this draws:
+        /// - A button with the method name or custom label
+        /// - Parameter fields if the method has parameters
+        /// - Error handling for method execution
+        /// 
+        /// It supports both regular methods and coroutines, and displays
+        /// return values if the method returns a non-null result.
+        /// </remarks>
         private void DrawButtons()
         {
             foreach (ButtonComponents.MethodCache methodCache in buttonMethods)
@@ -132,6 +205,14 @@ namespace Editor
 
         #region Notes Methods
 
+        /// <summary>
+        /// Initializes the notes system for the current component.
+        /// </summary>
+        /// <remarks>
+        /// This method loads the notes data asset, checks if the current component type
+        /// is allowed to have notes, and retrieves any existing note for this component.
+        /// It also restores the expanded/collapsed state of the notes section from EditorPrefs.
+        /// </remarks>
         private void InitializeNotesSystem()
         {
             notesData = AssetDatabase.LoadAssetAtPath<InspectorNotesData>("Assets/ByteForge/InspectorNotesData.asset");
@@ -146,6 +227,14 @@ namespace Editor
             noteSectionExpanded = EditorPrefs.GetBool(FoldoutPrefsKey + noteKey, true);
         }
 
+        /// <summary>
+        /// Draws the notes section of the inspector.
+        /// </summary>
+        /// <remarks>
+        /// This method handles the foldout header for the notes section
+        /// and calls the appropriate method to draw either the note display
+        /// or the note editing interface based on the current state.
+        /// </remarks>
         private void DrawNotesSection()
         {
             string noteKey = NotesUtility.GetNoteKey((MonoBehaviour)target);
@@ -169,6 +258,14 @@ namespace Editor
             EditorGUI.indentLevel--;
         }
 
+        /// <summary>
+        /// Draws the note editing interface.
+        /// </summary>
+        /// <remarks>
+        /// This method displays a text area for editing the note content
+        /// and buttons to save or cancel the changes. The text area automatically
+        /// adjusts its height based on the content while staying within reasonable limits.
+        /// </remarks>
         private void DrawNoteEditField()
         {
             EditorGUILayout.LabelField("Edit Note:");
@@ -204,6 +301,14 @@ namespace Editor
             EditorGUILayout.EndHorizontal();
         }
 
+        /// <summary>
+        /// Draws the note display interface.
+        /// </summary>
+        /// <remarks>
+        /// This method shows the current note content in a scrollable area
+        /// and provides buttons to edit or delete the note. If no note exists,
+        /// it displays a button to add a new note.
+        /// </remarks>
         private void DrawNoteDisplay()
         {
             if (!string.IsNullOrEmpty(currentNote))
@@ -233,6 +338,14 @@ namespace Editor
             }
         }
 
+        /// <summary>
+        /// Saves the current note to the notes data asset.
+        /// </summary>
+        /// <remarks>
+        /// This method either updates an existing note or creates a new one,
+        /// then marks the notes data asset as dirty and saves it to persist
+        /// the changes between editor sessions.
+        /// </remarks>
         private void SaveNote()
         {
             string noteKey = NotesUtility.GetNoteKey((MonoBehaviour)target);
@@ -253,6 +366,14 @@ namespace Editor
             AssetDatabase.SaveAssets();
         }
 
+        /// <summary>
+        /// Deletes the note for the current component.
+        /// </summary>
+        /// <remarks>
+        /// This method removes the note entry from the notes data asset,
+        /// marks the asset as dirty, and saves it to persist the changes.
+        /// It also clears the current note content.
+        /// </remarks>
         private void DeleteNote()
         {
             string noteKey = NotesUtility.GetNoteKey((MonoBehaviour)target);

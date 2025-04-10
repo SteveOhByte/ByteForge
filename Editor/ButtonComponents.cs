@@ -9,18 +9,54 @@ using UnityEngine;
 
 namespace ByteForge.Editor
 {
+    /// <summary>
+    /// Provides functionality for invoking methods from the Unity inspector via customizable buttons.
+    /// </summary>
+    /// <remarks>
+    /// This class contains the core components used by the button system to enable method execution
+    /// from the inspector. It includes classes for caching method information, storing parameter values,
+    /// and drawing parameter fields in the inspector.
+    /// </remarks>
     public class ButtonComponents
     {
         /// <summary>
         /// Caches information about methods that can be invoked from the inspector.
         /// </summary>
+        /// <remarks>
+        /// Stores method metadata along with parameter information and current parameter values.
+        /// This cache improves performance by avoiding repeated reflection operations.
+        /// </remarks>
         public class MethodCache
         {
+            /// <summary>
+            /// Gets the reflected method information.
+            /// </summary>
             public MethodInfo Method { get; }
+            
+            /// <summary>
+            /// Gets the display name to show on the button in the inspector.
+            /// </summary>
             public string DisplayName { get; }
+            
+            /// <summary>
+            /// Gets information about the method's parameters.
+            /// </summary>
             public ParameterInfo[] Parameters { get; }
+            
+            /// <summary>
+            /// Gets the current values for each parameter.
+            /// </summary>
             public object[] ParameterValues { get; }
 
+            /// <summary>
+            /// Initializes a new instance of the MethodCache class.
+            /// </summary>
+            /// <param name="method">The reflected method information.</param>
+            /// <param name="displayName">The name to show on the button in the inspector.</param>
+            /// <remarks>
+            /// Creates default values for each parameter based on the parameter type.
+            /// Value types are initialized with Activator.CreateInstance, while reference types default to null.
+            /// </remarks>
             public MethodCache(MethodInfo method, string displayName)
             {
                 Method = method;
@@ -40,10 +76,28 @@ namespace ByteForge.Editor
         /// <summary>
         /// Static cache to store methods for different component types.
         /// </summary>
+        /// <remarks>
+        /// Maintains a dictionary of component types to their button methods,
+        /// avoiding the need to use reflection to find the methods each time
+        /// the inspector is drawn.
+        /// </remarks>
         public static class ButtonMethodCache
         {
+            /// <summary>
+            /// Dictionary mapping component types to their button methods.
+            /// </summary>
             private static readonly Dictionary<Type, List<MethodCache>> cachedMethods = new();
 
+            /// <summary>
+            /// Gets or creates a list of button methods for a specific component type.
+            /// </summary>
+            /// <param name="type">The component type to get methods for.</param>
+            /// <returns>A list of MethodCache objects for the specified type.</returns>
+            /// <remarks>
+            /// If the methods for this type are already cached, returns them from the cache.
+            /// Otherwise, uses reflection to find all methods with the InspectorButtonAttribute
+            /// and caches them for future use.
+            /// </remarks>
             public static List<MethodCache> GetMethodsForType(Type type)
             {
                 if (cachedMethods.TryGetValue(type, out List<MethodCache> methods))
@@ -72,10 +126,25 @@ namespace ByteForge.Editor
         }
 
         /// <summary>
-        /// Utility for drawing parameter fields for method parameters.
+        /// Utility for drawing parameter fields in the inspector.
         /// </summary>
+        /// <remarks>
+        /// Provides methods to draw appropriate editor fields for different parameter types,
+        /// supporting a wide range of common Unity and C# types.
+        /// </remarks>
         public static class ParameterDrawer
         {
+            /// <summary>
+            /// Draws an appropriate inspector field for a method parameter.
+            /// </summary>
+            /// <param name="parameter">Information about the parameter.</param>
+            /// <param name="currentValue">The current value of the parameter.</param>
+            /// <returns>The new value from the inspector field.</returns>
+            /// <remarks>
+            /// Supports common types like int, float, bool, string, Vector2/3, Color, enums,
+            /// Unity Objects, and types with static readonly fields (like constants).
+            /// For unsupported types, displays a disabled text field with a message.
+            /// </remarks>
             public static object DrawParameterField(ParameterInfo parameter, object currentValue)
             {
                 Type parameterType = parameter.ParameterType;
@@ -109,12 +178,32 @@ namespace ByteForge.Editor
                 return currentValue;
             }
 
+            /// <summary>
+            /// Determines if a type has static readonly fields that can be used as constants.
+            /// </summary>
+            /// <param name="type">The type to check.</param>
+            /// <returns>True if the type has static readonly fields of its own type; otherwise, false.</returns>
+            /// <remarks>
+            /// This is used to support types that define constants as static readonly fields,
+            /// allowing them to be displayed as dropdown menus in the inspector.
+            /// </remarks>
             private static bool HasStaticReadOnlyFields(Type type)
             {
                 return type.GetFields(BindingFlags.Public | BindingFlags.Static)
                     .Any(f => f.IsInitOnly && f.FieldType == type);
             }
 
+            /// <summary>
+            /// Draws a dropdown for types with static readonly fields.
+            /// </summary>
+            /// <param name="parameterName">The name of the parameter.</param>
+            /// <param name="type">The type with static readonly fields.</param>
+            /// <param name="currentValue">The current value of the parameter.</param>
+            /// <returns>The selected static field value.</returns>
+            /// <remarks>
+            /// Creates a popup menu containing all static readonly fields of the specified type,
+            /// allowing them to be selected as parameter values.
+            /// </remarks>
             private static object HandleStaticReadOnlyFieldsType(string parameterName, Type type, object currentValue)
             {
                 FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);

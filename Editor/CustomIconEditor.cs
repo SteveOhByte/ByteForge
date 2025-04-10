@@ -2,17 +2,48 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace ByteFroge.Editor
 {
+    /// <summary>
+    /// Editor window for assigning custom icons to assets in the Project window.
+    /// </summary>
+    /// <remarks>
+    /// This window allows developers to customize the icons displayed for various asset types
+    /// in the Unity Project view. It provides a UI for selecting from built-in icons or
+    /// assigning custom textures as icons for supported asset types.
+    /// </remarks>
+    [SuppressMessage("Domain reload", "UDR0005:Domain Reload Analyzer")]
     public class CustomIconEditor : EditorWindow
     {
+        /// <summary>
+        /// Prefix used for storing custom icon preferences in EditorPrefs.
+        /// </summary>
         private const string ICON_PREFS_PREFIX = "CustomIcon_";
+        
+        /// <summary>
+        /// The currently selected object to customize.
+        /// </summary>
         private Object selectedObject;
+        
+        /// <summary>
+        /// The custom icon texture assigned by the user.
+        /// </summary>
         private Texture2D customIcon;
+        
+        /// <summary>
+        /// Scroll position for the built-in icons list.
+        /// </summary>
         private Vector2 scrollPosition;
 
+        /// <summary>
+        /// Set of asset types that support custom icons.
+        /// </summary>
+        /// <remarks>
+        /// Only these asset types will allow icon customization through this tool.
+        /// </remarks>
         private static readonly HashSet<string> supportedTypes = new()
         {
             "ScriptableObject",
@@ -20,22 +51,50 @@ namespace ByteFroge.Editor
             "GameObject"
         };
 
+        /// <summary>
+        /// Shows the custom icon editor window.
+        /// </summary>
+        /// <remarks>
+        /// This method is called when the "Assets/Set Custom Icon" menu item is selected.
+        /// It creates and displays the custom icon editor window.
+        /// </remarks>
         [MenuItem("Assets/Set Custom Icon")]
         public static void ShowWindow()
         {
             GetWindow<CustomIconEditor>("Custom Icons");
         }
 
+        /// <summary>
+        /// Called when the window becomes enabled.
+        /// </summary>
+        /// <remarks>
+        /// Subscribes to the selection changed event to update the window
+        /// when the user selects different assets.
+        /// </remarks>
         private void OnEnable()
         {
             Selection.selectionChanged += Repaint;
         }
 
+        /// <summary>
+        /// Called when the window becomes disabled.
+        /// </summary>
+        /// <remarks>
+        /// Unsubscribes from the selection changed event to prevent memory leaks.
+        /// </remarks>
         private void OnDisable()
         {
             Selection.selectionChanged -= Repaint;
         }
 
+        /// <summary>
+        /// Draws the GUI for the custom icon editor window.
+        /// </summary>
+        /// <remarks>
+        /// Displays the current selection, custom icon selector, and built-in icons grid.
+        /// Shows appropriate messages if no asset is selected or if the selected asset
+        /// doesn't support custom icons.
+        /// </remarks>
         private void OnGUI()
         {
             selectedObject = Selection.activeObject;
@@ -57,6 +116,14 @@ namespace ByteFroge.Editor
             DrawBuiltInIcons();
         }
 
+        /// <summary>
+        /// Determines if the selected object type supports custom icons.
+        /// </summary>
+        /// <param name="obj">The object to check.</param>
+        /// <returns>True if the object type supports custom icons; otherwise, false.</returns>
+        /// <remarks>
+        /// Supports prefabs, ScriptableObjects, and asset types listed in the supportedTypes collection.
+        /// </remarks>
         private bool IsSupported(Object obj)
         {
             if (obj == null) return false;
@@ -71,6 +138,13 @@ namespace ByteFroge.Editor
             return supportedTypes.Any(t => obj.GetType().Name.Contains(t));
         }
 
+        /// <summary>
+        /// Draws the custom icon selection interface.
+        /// </summary>
+        /// <remarks>
+        /// Displays the current icon, a field for selecting a custom texture,
+        /// and buttons for applying or resetting the icon.
+        /// </remarks>
         private void DrawIconSelector()
         {
             EditorGUILayout.BeginHorizontal();
@@ -97,6 +171,13 @@ namespace ByteFroge.Editor
             EditorGUILayout.EndHorizontal();
         }
 
+        /// <summary>
+        /// Draws the grid of built-in icons that can be applied.
+        /// </summary>
+        /// <remarks>
+        /// Displays a scrollable grid of texture icons found in the project
+        /// that can be applied to the selected asset with a single click.
+        /// </remarks>
         private void DrawBuiltInIcons()
         {
             EditorGUILayout.LabelField("Built-in Icons", EditorStyles.boldLabel);
@@ -125,6 +206,15 @@ namespace ByteFroge.Editor
             EditorGUILayout.EndScrollView();
         }
 
+        /// <summary>
+        /// Gets the current custom icon for an object.
+        /// </summary>
+        /// <param name="obj">The object to get the custom icon for.</param>
+        /// <returns>The custom icon texture if one is set; otherwise, the default icon.</returns>
+        /// <remarks>
+        /// Retrieves the custom icon path from EditorPrefs and loads the texture.
+        /// If no custom icon is set or the texture can't be loaded, returns the default icon.
+        /// </remarks>
         private Texture GetCustomIcon(Object obj)
         {
             string iconKey = ICON_PREFS_PREFIX + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(obj));
@@ -136,6 +226,15 @@ namespace ByteFroge.Editor
             return AssetDatabase.LoadAssetAtPath<Texture2D>(iconPath);
         }
 
+        /// <summary>
+        /// Sets a custom icon for an object.
+        /// </summary>
+        /// <param name="obj">The object to set the custom icon for.</param>
+        /// <param name="icon">The texture to use as the custom icon.</param>
+        /// <remarks>
+        /// Stores the icon path in EditorPrefs and marks the object as dirty
+        /// to force Unity to refresh the icon in the Project view.
+        /// </remarks>
         private void SetCustomIcon(Object obj, Texture icon)
         {
             string iconKey = ICON_PREFS_PREFIX + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(obj));
@@ -147,6 +246,14 @@ namespace ByteFroge.Editor
             AssetDatabase.SaveAssets();
         }
 
+        /// <summary>
+        /// Resets an object's icon to the default.
+        /// </summary>
+        /// <param name="obj">The object to reset the icon for.</param>
+        /// <remarks>
+        /// Removes the custom icon entry from EditorPrefs and marks the object as dirty
+        /// to force Unity to refresh the icon in the Project view.
+        /// </remarks>
         private void ResetIcon(Object obj)
         {
             string iconKey = ICON_PREFS_PREFIX + AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(obj));
@@ -155,6 +262,14 @@ namespace ByteFroge.Editor
             AssetDatabase.SaveAssets();
         }
 
+        /// <summary>
+        /// Gets a list of built-in icons available in the project.
+        /// </summary>
+        /// <returns>A list of texture assets that can be used as icons.</returns>
+        /// <remarks>
+        /// Searches the project for texture assets with "icon" in their name
+        /// to provide a collection of ready-to-use icons.
+        /// </remarks>
         private List<Texture> GetBuiltInIcons()
         {
             List<Texture> icons = new();

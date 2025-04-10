@@ -9,25 +9,58 @@ using UnityEngine;
 namespace ByteForge.Editor
 {
     /// <summary>
-    /// Handles the grouping and drawing of properties in the inspector.
+    /// Handles the organization and display of properties in the Unity inspector.
     /// </summary>
+    /// <remarks>
+    /// This class provides advanced inspector customization, allowing properties to be
+    /// organized into tabs, group boxes, and foldouts based on attributes applied to
+    /// the fields. It handles the grouping logic and drawing of the custom inspector UI.
+    /// </remarks>
     public class GroupDrawer
     {
+        /// <summary>
+        /// The SerializedObject being drawn in the inspector.
+        /// </summary>
         private SerializedObject serializedObject;
+        
+        /// <summary>
+        /// Dictionary tracking the currently selected tab in each tab group.
+        /// </summary>
         private Dictionary<string, int> tabGroups = new();
+        
+        /// <summary>
+        /// Dictionary tracking the expanded/collapsed state of each foldout group.
+        /// </summary>
         private Dictionary<string, bool> foldoutStates = new();
 
-        // Cache to avoid checking all properties multiple times
+        /// <summary>
+        /// Cache to avoid repeated attribute checking.
+        /// </summary>
+        /// <remarks>
+        /// Nullable boolean that stores whether any property has grouping attributes,
+        /// avoiding the need to scan all properties multiple times.
+        /// </remarks>
         private bool? hasGroupingAttributes = null;
 
+        /// <summary>
+        /// Initializes a new instance of the GroupDrawer class.
+        /// </summary>
+        /// <param name="serializedObject">The SerializedObject to draw in the inspector.</param>
         public GroupDrawer(SerializedObject serializedObject)
         {
             this.serializedObject = serializedObject;
         }
 
         /// <summary>
-        /// Checks if any property in the serialized object has grouping attributes.
+        /// Determines if any property in the serialized object has grouping attributes.
         /// </summary>
+        /// <returns>
+        /// True if at least one property has a TabGroup, GroupBox, or FoldoutGroup attribute;
+        /// otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// This method uses caching to improve performance when called multiple times.
+        /// </remarks>
         public bool HasGroupingAttributes()
         {
             if (hasGroupingAttributes.HasValue)
@@ -58,8 +91,12 @@ namespace ByteForge.Editor
         }
 
         /// <summary>
-        /// Draws the inspector with grouped properties.
+        /// Draws the complete inspector with grouped properties.
         /// </summary>
+        /// <remarks>
+        /// This is the main entry point for drawing the custom inspector.
+        /// It organizes properties into tabs and groups, then draws them accordingly.
+        /// </remarks>
         public void DrawGroupedInspector()
         {
             serializedObject.Update();
@@ -92,6 +129,14 @@ namespace ByteForge.Editor
         /// <summary>
         /// Groups properties by tab attributes.
         /// </summary>
+        /// <returns>
+        /// A nested dictionary where the outer key is the tab group name,
+        /// the inner key is the tab name, and the value is a list of properties in that tab.
+        /// </returns>
+        /// <remarks>
+        /// This method scans all properties and organizes those with TabGroup attributes
+        /// into their respective tab groups and tabs.
+        /// </remarks>
         private Dictionary<string, Dictionary<string, List<SerializedProperty>>> GroupPropertiesByTabs()
         {
             Dictionary<string, Dictionary<string, List<SerializedProperty>>> result = new();
@@ -128,6 +173,14 @@ namespace ByteForge.Editor
         /// <summary>
         /// Gets properties that don't have a tab attribute.
         /// </summary>
+        /// <returns>
+        /// A dictionary where the key is the group name (empty string for ungrouped properties),
+        /// and the value is a list of properties in that group.
+        /// </returns>
+        /// <remarks>
+        /// This method collects all properties that don't have a TabGroup attribute,
+        /// and organizes them by GroupBox attribute if they have one.
+        /// </remarks>
         private Dictionary<string, List<SerializedProperty>> GetNonTabProperties()
         {
             Dictionary<string, List<SerializedProperty>> result = new();
@@ -161,8 +214,14 @@ namespace ByteForge.Editor
         }
 
         /// <summary>
-        /// Draws a tab group.
+        /// Draws a tab group with selectable tabs.
         /// </summary>
+        /// <param name="tabGroupName">The name of the tab group.</param>
+        /// <param name="tabs">A dictionary of tab names and their properties.</param>
+        /// <remarks>
+        /// This method draws a tab group with buttons for each tab, and displays
+        /// the properties of the currently selected tab.
+        /// </remarks>
         private void DrawTabGroup(string tabGroupName, Dictionary<string, List<SerializedProperty>> tabs)
         {
             EditorGUILayout.BeginVertical(EditorStyles.helpBox);
@@ -207,6 +266,14 @@ namespace ByteForge.Editor
         /// <summary>
         /// Groups properties by GroupBox attribute.
         /// </summary>
+        /// <param name="properties">The list of properties to group.</param>
+        /// <returns>
+        /// A dictionary where the key is the group name (empty string for ungrouped properties),
+        /// and the value is a list of properties in that group.
+        /// </returns>
+        /// <remarks>
+        /// This method organizes properties based on their GroupBox attributes.
+        /// </remarks>
         private Dictionary<string, List<SerializedProperty>> GroupPropertiesByGroupBox(
             List<SerializedProperty> properties)
         {
@@ -229,6 +296,11 @@ namespace ByteForge.Editor
         /// <summary>
         /// Draws properties grouped by GroupBox attribute.
         /// </summary>
+        /// <param name="groupedProperties">A dictionary of group names and their properties.</param>
+        /// <remarks>
+        /// This method draws properties organized by group, with each group
+        /// displayed in a styled box with a header.
+        /// </remarks>
         private void DrawPropertiesGrouped(Dictionary<string, List<SerializedProperty>> groupedProperties)
         {
             foreach (KeyValuePair<string, List<SerializedProperty>> group in groupedProperties)
@@ -260,6 +332,14 @@ namespace ByteForge.Editor
         /// <summary>
         /// Groups properties by FoldoutGroup attribute.
         /// </summary>
+        /// <param name="properties">The list of properties to group.</param>
+        /// <returns>
+        /// A dictionary where the key is the foldout name (empty string for non-foldout properties),
+        /// and the value is a list of properties in that foldout.
+        /// </returns>
+        /// <remarks>
+        /// This method organizes properties based on their FoldoutGroup attributes.
+        /// </remarks>
         private Dictionary<string, List<SerializedProperty>> GroupPropertiesByFoldout(
             List<SerializedProperty> properties)
         {
@@ -283,6 +363,11 @@ namespace ByteForge.Editor
         /// <summary>
         /// Draws properties grouped by FoldoutGroup attribute.
         /// </summary>
+        /// <param name="foldoutGrouped">A dictionary of foldout names and their properties.</param>
+        /// <remarks>
+        /// This method draws properties organized by foldout, with each foldout
+        /// having an expandable/collapsible header.
+        /// </remarks>
         private void DrawFoldoutGroups(Dictionary<string, List<SerializedProperty>> foldoutGrouped)
         {
             foreach (KeyValuePair<string, List<SerializedProperty>> foldout in foldoutGrouped)
@@ -315,6 +400,11 @@ namespace ByteForge.Editor
         /// <summary>
         /// Draws a property with respect to its custom attributes.
         /// </summary>
+        /// <param name="property">The property to draw.</param>
+        /// <remarks>
+        /// This method handles drawing a property, taking into account any custom
+        /// attributes that affect how it should be displayed in the inspector.
+        /// </remarks>
         private void DrawProperty(SerializedProperty property)
         {
             // Get custom label if any
@@ -336,6 +426,12 @@ namespace ByteForge.Editor
         /// <summary>
         /// Draws a property with the AssetsOnly attribute.
         /// </summary>
+        /// <param name="property">The property to draw.</param>
+        /// <param name="label">The label to display.</param>
+        /// <remarks>
+        /// This method draws a property field that only accepts project assets (not scene objects)
+        /// and displays a warning if the user tries to assign a scene object.
+        /// </remarks>
         private void DrawAssetsOnlyField(SerializedProperty property, GUIContent label)
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference)
@@ -361,6 +457,12 @@ namespace ByteForge.Editor
         /// <summary>
         /// Draws a property with the SceneObjectsOnly attribute.
         /// </summary>
+        /// <param name="property">The property to draw.</param>
+        /// <param name="label">The label to display.</param>
+        /// <remarks>
+        /// This method draws a property field that only accepts scene objects (not project assets)
+        /// and displays a warning if the user tries to assign a project asset.
+        /// </remarks>
         private void DrawSceneObjectsOnlyField(SerializedProperty property, GUIContent label)
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference)

@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR // Ensure this code is only compiled and used in the editor, not in builds
+﻿#if UNITY_EDITOR
 using ByteForge.Runtime;
 using UnityEditor;
 using UnityEngine;
@@ -6,20 +6,25 @@ using UnityEngine;
 namespace ByteForge.Editor
 {
     /// <summary>
-    /// Custom drawer for the 'Required' attribute.
-    /// This marks any object reference field as required when it is null,
-    /// and displays an error message in the inspector
+    /// Custom property drawer for the 'Required' attribute.
     /// </summary>
+    /// <remarks>
+    /// This drawer marks any object reference field as required when it is null,
+    /// and displays a red error message in the inspector to alert developers.
+    /// </remarks>
     [CustomPropertyDrawer(typeof(Required))]
     public class RequiredPropertyDrawer : PropertyDrawer
     {
         /// <summary>
-        /// Returns the height of the property in the Unity inspector
-        /// Adjusts height if the property is an object reference and it's null
+        /// Returns the height of the property in the Unity inspector.
         /// </summary>
-        /// <param name="property">The serialized property being drawn</param>
-        /// <param name="label">The label of the property</param>
-        /// <returns>The height of the property in pixels</returns>
+        /// <param name="property">The serialized property being drawn.</param>
+        /// <param name="label">The label of the property.</param>
+        /// <returns>The height of the property in pixels.</returns>
+        /// <remarks>
+        /// Adjusts height if the property is an object reference and it's null to accommodate
+        /// the additional error message that will be displayed.
+        /// </remarks>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             if (property.propertyType == SerializedPropertyType.ObjectReference &&
@@ -33,12 +38,15 @@ namespace ByteForge.Editor
         }
 
         /// <summary>
-        /// Draws the GUI in the Unity inspector for the 'Required' attribute
-        /// If the property is an object reference and it's null, display an error message
+        /// Draws the GUI in the Unity inspector for the 'Required' attribute.
         /// </summary>
-        /// <param name="position">The position to draw the GUI</param>
-        /// <param name="property">The serialized property being drawn</param>
-        /// <param name="label">The label of the property</param>
+        /// <param name="position">The position to draw the GUI.</param>
+        /// <param name="property">The serialized property being drawn.</param>
+        /// <param name="label">The label of the property.</param>
+        /// <remarks>
+        /// If the property is an object reference and it's null, displays an error message
+        /// with a red background to highlight the issue to developers.
+        /// </remarks>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             // Adjust the position for the property field

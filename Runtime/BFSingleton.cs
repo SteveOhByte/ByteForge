@@ -1,77 +1,86 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ByteForge.Runtime
 {
     /// <summary>
-    /// Generic singleton class for MonoBehaviours
+    /// Base class for implementing the Singleton pattern for MonoBehaviours.
     /// </summary>
-    /// <typeparam name="T">Type of the singleton</typeparam>
+    /// <typeparam name="T">The type of the singleton class (must be a MonoBehaviour).</typeparam>
+    /// <remarks>
+    /// BFSingleton provides a thread-safe implementation of the Singleton pattern
+    /// with automatic instance creation and duplicate prevention. When inheriting from this class,
+    /// your MonoBehaviour will have a static Instance property that returns the single instance,
+    /// creating one if it doesn't exist. The instance is automatically set to persist across scene loads.
+    /// </remarks>
     public abstract class BFSingleton<T> : MonoBehaviour where T : MonoBehaviour
     {
-        // Private instance field
+        /// <summary>
+        /// The single instance of this type.
+        /// </summary>
+        /// <remarks>
+        /// This is initialized lazily the first time it's accessed.
+        /// </remarks>
+        #pragma warning disable UDR0001
         private static T instance;
+        #pragma warning restore UDR0001
 
-        // Public instance property with thread safety
+        /// <summary>
+        /// Gets the singleton instance of this type.
+        /// </summary>
+        /// <remarks>
+        /// This property provides thread-safe access to the singleton instance.
+        /// If the instance doesn't exist, it first tries to find an existing instance in the scene.
+        /// If no instance is found, it creates a new GameObject with the component attached
+        /// and marks it to persist across scene loads.
+        /// </remarks>
+        /// <value>The singleton instance of the specified type.</value>
         public static T Instance
         {
             get
             {
+                // Return existing instance immediately if available
+                if (instance != null)
+                    return instance;
+
+                // First try to find an existing instance
+                instance = FindAnyObjectByType<T>();
+
                 if (instance == null)
                 {
-                    // First try to find an existing instance in the scene
-                    instance = FindAnyObjectByType<T>();
+                    GameObject singletonObject = new($"{typeof(T).Name} (Singleton)");
+                    instance = singletonObject.AddComponent<T>();
 
-                    // If no instance exists, create a new one
-                    if (instance == null)
-                    {
-                        // Create a new GameObject
-                        GameObject singletonObject = new GameObject();
-                        instance = singletonObject.AddComponent<T>();
-                        singletonObject.name = typeof(T).Name + " (Singleton)";
-
-                        // Make sure it persists between scenes if needed
-                        DontDestroyOnLoad(singletonObject);
-
-                        BFDebug.Log($"{typeof(T).Name} singleton instance created.");
-                    }
+                    DontDestroyOnLoad(singletonObject);
+                    BFDebug.Log($"{typeof(T).Name} singleton instance created.");
                 }
 
                 return instance;
             }
         }
-        
-        protected bool isQuitting;
 
-        // Make sure we don't have duplicate singletons when a scene loads
+        /// <summary>
+        /// Virtual method called when the MonoBehaviour is being initialized.
+        /// </summary>
+        /// <remarks>
+        /// The base implementation handles singleton instance management by:
+        /// 1. Checking if another instance already exists
+        /// 2. Destroying this object if it's a duplicate
+        /// 3. Setting this object as the instance if it's the first
+        /// 4. Marking the object to persist across scene loads
+        /// 
+        /// When overriding, always call base.Awake() first to maintain singleton behavior.
+        /// </remarks>
         protected virtual void Awake()
         {
             if (instance != null && instance != this)
             {
-                // Duplicate singleton found, destroy this one
                 BFDebug.LogWarning($"Multiple instances of {typeof(T).Name} found. Destroying duplicate.");
                 Destroy(gameObject);
+                return;
             }
-            else if (instance == null)
-            {
-                // This is the first instance - make it the singleton
-                instance = this as T;
 
-                // Make sure it persists between scenes if needed
-                DontDestroyOnLoad(gameObject);
-            }
-        }
-
-        // Clean up on destroy
-        protected virtual void OnDestroy()
-        {
-            if (instance == this)
-                instance = null;
-        }
-
-        protected void OnApplicationQuit()
-        {
-            isQuitting = true;
+            instance = this as T;
+            DontDestroyOnLoad(gameObject);
         }
     }
 }

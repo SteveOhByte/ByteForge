@@ -9,11 +9,24 @@ using Object = UnityEngine.Object;
 namespace ByteForge.Editor
 {
     /// <summary>
-    /// Custom drawer for the Label attribute.
+    /// Custom property drawer for the Label attribute.
     /// </summary>
+    /// <remarks>
+    /// This drawer changes the display name of a field in the inspector
+    /// using the custom label provided in the LabelAttribute.
+    /// </remarks>
     [CustomPropertyDrawer(typeof(LabelAttribute))]
     public class LabelPropertyDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// Draws the GUI for the property with a custom label.
+        /// </summary>
+        /// <param name="position">The position to draw the property.</param>
+        /// <param name="property">The serialized property being drawn.</param>
+        /// <param name="label">The default label of the property.</param>
+        /// <remarks>
+        /// Replaces the default label text with the custom text specified in the LabelAttribute.
+        /// </remarks>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             LabelAttribute labelAttr = attribute as LabelAttribute;
@@ -23,11 +36,25 @@ namespace ByteForge.Editor
     }
 
     /// <summary>
-    /// Custom drawer for the AssetsOnly attribute.
+    /// Custom property drawer for the AssetsOnly attribute.
     /// </summary>
+    /// <remarks>
+    /// This drawer validates that an object reference field only accepts
+    /// project assets (from Assets folder) and not scene objects.
+    /// </remarks>
     [CustomPropertyDrawer(typeof(AssetsOnlyAttribute))]
     public class AssetsOnlyPropertyDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// Draws the GUI for the property with asset validation.
+        /// </summary>
+        /// <param name="position">The position to draw the property.</param>
+        /// <param name="property">The serialized property being drawn.</param>
+        /// <param name="label">The label of the property.</param>
+        /// <remarks>
+        /// Displays a warning and prevents assignment if the user attempts to
+        /// assign a scene object instead of a project asset.
+        /// </remarks>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
@@ -55,11 +82,25 @@ namespace ByteForge.Editor
     }
 
     /// <summary>
-    /// Custom drawer for the SceneObjectsOnly attribute.
+    /// Custom property drawer for the SceneObjectsOnly attribute.
     /// </summary>
+    /// <remarks>
+    /// This drawer validates that an object reference field only accepts
+    /// scene objects and not project assets (from Assets folder).
+    /// </remarks>
     [CustomPropertyDrawer(typeof(SceneObjectsOnlyAttribute))]
     public class SceneObjectsOnlyPropertyDrawer : PropertyDrawer
     {
+        /// <summary>
+        /// Draws the GUI for the property with scene object validation.
+        /// </summary>
+        /// <param name="position">The position to draw the property.</param>
+        /// <param name="property">The serialized property being drawn.</param>
+        /// <param name="label">The label of the property.</param>
+        /// <remarks>
+        /// Displays a warning and prevents assignment if the user attempts to
+        /// assign a project asset instead of a scene object.
+        /// </remarks>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.BeginProperty(position, label, property);
@@ -87,13 +128,24 @@ namespace ByteForge.Editor
     }
 
     /// <summary>
-    /// Utility class for property reflection.
+    /// Utility class for property reflection operations.
     /// </summary>
+    /// <remarks>
+    /// Provides methods to extract information about serialized properties
+    /// and their underlying field information using reflection.
+    /// </remarks>
     public static class PropertyReflectionUtility
     {
         /// <summary>
         /// Gets a specific attribute from a SerializedProperty.
         /// </summary>
+        /// <typeparam name="T">The type of attribute to retrieve.</typeparam>
+        /// <param name="property">The serialized property to get the attribute from.</param>
+        /// <returns>The first attribute of the specified type, or null if not found.</returns>
+        /// <remarks>
+        /// Uses reflection to find the field info for the property and then
+        /// retrieves the first attribute of the specified type from that field.
+        /// </remarks>
         public static T GetAttribute<T>(SerializedProperty property) where T : PropertyAttribute
         {
             FieldInfo fieldInfo = GetFieldInfo(property);
@@ -107,6 +159,12 @@ namespace ByteForge.Editor
         /// <summary>
         /// Gets the FieldInfo for a SerializedProperty.
         /// </summary>
+        /// <param name="property">The serialized property to get field info for.</param>
+        /// <returns>The FieldInfo object representing the field, or null if not found.</returns>
+        /// <remarks>
+        /// Navigates through the property path to find the correct field info,
+        /// handling nested properties and array elements.
+        /// </remarks>
         public static FieldInfo GetFieldInfo(SerializedProperty property)
         {
             Object targetObject = property.serializedObject.targetObject;
