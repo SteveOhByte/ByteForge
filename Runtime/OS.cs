@@ -57,7 +57,7 @@ namespace ByteForge.Runtime
         /// <param name="hWnd">Handle to the owner window of the message box.</param>
         /// <param name="text">The message to be displayed.</param>
         /// <param name="caption">The title of the message box.</param>
-        /// <param name="type">The type and behavior of the message box.</param>
+        /// <param name="type">The type and behaviour of the message box.</param>
         /// <returns>The value of the selected button.</returns>
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);

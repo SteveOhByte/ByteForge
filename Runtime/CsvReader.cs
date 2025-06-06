@@ -48,7 +48,7 @@ namespace ByteForge.Runtime
         /// <param name="reader">The TextReader to use for reading CSV data.</param>
         /// <param name="configuration">The configuration to use for reading CSV data.</param>
         /// <remarks>
-        /// This constructor allows full control over the CSV parsing behavior through the configuration object.
+        /// This constructor allows full control over the CSV parsing behaviour through the configuration object.
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown if reader or configuration is null.</exception>
         public CsvReader(TextReader reader, CsvConfiguration configuration)
@@ -94,7 +94,7 @@ namespace ByteForge.Runtime
                         object value = GetField(i);
 
                         // If the field value is empty and the property type isn't string,
-                        // we need to handle it specially
+                        // Handle it specially
                         if (value is string stringValue && string.IsNullOrEmpty(stringValue) &&
                             propertyInfo.PropertyType != typeof(string))
                         {

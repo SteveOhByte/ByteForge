@@ -141,7 +141,7 @@ namespace ByteForge.Editor
             /// <param name="currentValue">The current value of the parameter.</param>
             /// <returns>The new value from the inspector field.</returns>
             /// <remarks>
-            /// Supports common types like int, float, bool, string, Vector2/3, Color, enums,
+            /// Supports common types like int, float, bool, string, Vector2/3, Colour, enums,
             /// Unity Objects, and types with static readonly fields (like constants).
             /// For unsupported types, displays a disabled text field with a message.
             /// </remarks>

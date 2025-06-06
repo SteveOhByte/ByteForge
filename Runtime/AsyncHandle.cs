@@ -70,7 +70,7 @@ namespace ByteForge.Runtime
     /// </summary>
     /// <typeparam name="T">The type of the value that will be returned by the async operation.</typeparam>
     /// <remarks>
-    /// AsyncHandle&lt;T&gt; extends the functionality of AsyncHandle by allowing the async operation
+    /// AsyncHandle(T) extends the functionality of AsyncHandle by allowing the async operation
     /// to return a value when it completes. This provides a capability that traditional coroutines
     /// don't have, making it possible to get results from async operations.
     /// </remarks>
@@ -93,7 +93,7 @@ namespace ByteForge.Runtime
         private readonly Task<T> task;
 
         /// <summary>
-        /// Initializes a new instance of the AsyncHandle&lt;T&gt; struct.
+        /// Initializes a new instance of the AsyncHandle(T) struct.
         /// </summary>
         /// <param name="id">The unique identifier for the async operation.</param>
         /// <param name="task">The task representing the async operation with a result.</param>
@@ -109,14 +109,14 @@ namespace ByteForge.Runtime
         /// <summary>
         /// Gets an awaiter that allows awaiting this AsyncHandle and getting its result.
         /// </summary>
-        /// <returns>A TaskAwaiter&lt;T&gt; that can be used to await the completion of this async operation and get its result.</returns>
+        /// <returns>A TaskAwaiter(T) that can be used to await the completion of this async operation and get its result.</returns>
         /// <remarks>
-        /// This method enables using the 'await' keyword directly on an AsyncHandle&lt;T&gt;,
+        /// This method enables using the 'await' keyword directly on an AsyncHandle,
         /// making it possible to get the result of an async operation.
         /// 
         /// Example:
         /// <code>
-        /// AsyncHandle&lt;int&gt; handle = someObject.RunAsync(() => SomeAsyncMethodReturningInt());
+        /// AsyncHandle(T) handle = someObject.RunAsync(() => SomeAsyncMethodReturningInt());
         /// int result = await handle; // Waits for the async operation to complete and gets its result
         /// </code>
         /// </remarks>

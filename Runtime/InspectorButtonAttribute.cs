@@ -16,7 +16,7 @@ namespace ByteForge.Runtime
     /// 
     /// Example usage:
     /// <code>
-    /// // Creates a button labeled "Spawn Enemy"
+    /// // Creates a button labelled "Spawn Enemy"
     /// [InspectorButton("Spawn Enemy")]
     /// private void SpawnEnemy()
     /// {

@@ -189,7 +189,7 @@ namespace ByteForge.Editor
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     if (field == null) return null;
 
-                    // Skip array elements, we need the array field info
+                    // Skip array elements, the array field info is needed
                     targetType = field.FieldType.GetElementType() ?? field.FieldType.GetGenericArguments()[0];
                 }
                 else

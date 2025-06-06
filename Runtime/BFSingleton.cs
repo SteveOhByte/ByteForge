@@ -68,7 +68,7 @@ namespace ByteForge.Runtime
         /// 3. Setting this object as the instance if it's the first
         /// 4. Marking the object to persist across scene loads
         /// 
-        /// When overriding, always call base.Awake() first to maintain singleton behavior.
+        /// When overriding, always call base.Awake() first to maintain singleton behaviour.
         /// </remarks>
         protected virtual void Awake()
         {

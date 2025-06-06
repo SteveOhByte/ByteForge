@@ -59,7 +59,7 @@ namespace ByteForge.Editor
         /// <param name="isSelected">Whether the item is selected.</param>
         /// <param name="isHovered">Whether the item is being hovered over.</param>
         /// <param name="isWindowFocused">Whether the containing window has focus.</param>
-        /// <returns>The appropriate Color for the given state.</returns>
+        /// <returns>The appropriate Colour for the given state.</returns>
         public static Color Get(bool isSelected, bool isHovered, bool isWindowFocused)
         {
             if (isSelected)

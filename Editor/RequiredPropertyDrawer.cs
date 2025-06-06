@@ -65,7 +65,7 @@ namespace ByteForge.Editor
             EditorGUI.HelpBox(helpBoxPosition, ObjectNames.NicifyVariableName(property.name) + " is required!",
                 MessageType.Error);
 
-            GUI.backgroundColor = previousColour; // Restore the previous background color
+            GUI.backgroundColor = previousColour; // Restore the previous background colour
         }
     }
 }

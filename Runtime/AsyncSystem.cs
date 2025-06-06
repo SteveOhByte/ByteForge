@@ -59,12 +59,13 @@ namespace ByteForge.Runtime
             Task task = asyncFunc(cts.Token);
             
             // When the task completes, remove the cancellation token
-            task.ContinueWith(t => 
+            // ReSharper disable once MethodSupportsCancellation
+            task.ContinueWith(_ => 
             {
                 taskCancellationTokens.Remove(id);
             });
 
-            return new AsyncHandle(id, task);
+            return new(id, task);
         }
         
         /// <summary>
@@ -88,12 +89,13 @@ namespace ByteForge.Runtime
             Task<T> task = asyncFunc(cts.Token);
             
             // When the task completes, remove the cancellation token
-            task.ContinueWith(t => 
+            // ReSharper disable once MethodSupportsCancellation
+            task.ContinueWith(_ => 
             {
                 taskCancellationTokens.Remove(id);
             });
 
-            return new AsyncHandle<T>(id, task);
+            return new(id, task);
         }
 
         /// <summary>

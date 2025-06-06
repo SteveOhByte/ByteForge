@@ -67,7 +67,7 @@ namespace ByteForge.Runtime
         private static bool isInitialized = false;
         
         /// <summary>
-        /// Initializes the logging system, creating necessary directories and setting up the log file.
+        /// Initializes the logging system, creating necessary directories, and setting up the log file.
         /// </summary>
         /// <remarks>
         /// This method creates the log directories if they don't exist, archives any existing log file,
@@ -107,7 +107,7 @@ namespace ByteForge.Runtime
         /// <param name="message">The message to log.</param>
         /// <remarks>
         /// This is a convenience method that logs a message with WARNING level.
-        /// In the Unity Editor, this appears with yellow warning coloring.
+        /// In the Unity Editor, this appears with yellow warning colouring.
         /// </remarks>
         // ReSharper disable Unity.PerformanceAnalysis
         public static void LogWarning(object message)
@@ -121,7 +121,7 @@ namespace ByteForge.Runtime
         /// <param name="message">The message to log.</param>
         /// <remarks>
         /// This is a convenience method that logs a message with ERROR level.
-        /// In the Unity Editor, this appears with red error coloring.
+        /// In the Unity Editor, this appears with red error colouring.
         /// </remarks>
         // ReSharper disable Unity.PerformanceAnalysis
         public static void LogError(object message)
@@ -135,7 +135,7 @@ namespace ByteForge.Runtime
         /// <param name="message">The message to log.</param>
         /// <remarks>
         /// This is a convenience method that logs a message with FATAL level.
-        /// In the Unity Editor, this appears with red error coloring and also throws
+        /// In the Unity Editor, this appears with red error colouring and also throws
         /// an exception to immediately alert developers to the critical issue.
         /// </remarks>
         // ReSharper disable Unity.PerformanceAnalysis
@@ -212,7 +212,7 @@ namespace ByteForge.Runtime
         /// <remarks>
         /// In the Unity Editor, this method uses Debug.Log, Debug.LogWarning, or Debug.LogError
         /// based on the severity level. For FATAL errors, it also throws an exception.
-        /// In builds, this method does nothing as Unity's debug logging is typically disabled.
+        /// In builds, this method does nothing.
         /// </remarks>
         private static void LogToConsole(object message, BFLogLevel level)
         {

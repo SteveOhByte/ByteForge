@@ -32,7 +32,7 @@ namespace ByteForge.Runtime
         /// </remarks>
         public static AsyncHandle RunAsync(this MonoBehaviour monoBehaviour, Expression<Func<Task>> methodExpression)
         {
-            return AsyncSystem.Run(async (ct) => await ExpressionExecutor.ExecuteAsync(methodExpression));
+            return AsyncSystem.Run(async (_) => await ExpressionExecutor.ExecuteAsync(methodExpression));
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace ByteForge.Runtime
         /// </remarks>
         public static AsyncHandle<T> RunAsync<T>(this MonoBehaviour monoBehaviour, Expression<Func<Task<T>>> methodExpression)
         {
-            return AsyncSystem.Run<T>(async (ct) => await ExpressionExecutor.ExecuteAsync(methodExpression));
+            return AsyncSystem.Run<T>(async (_) => await ExpressionExecutor.ExecuteAsync(methodExpression));
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace ByteForge.Runtime
         /// <param name="methodExpression">Lambda expression pointing to the method to run.</param>
         /// <returns>A handle that can be used to stop the async function or await its result.</returns>
         /// <remarks>
-        /// Example usage: var handle = this.RunAsync((ct) => MyAsyncMethodWithResult(ct))
+        /// Example usage: AsyncHandle handle = this.RunAsync((ct) => MyAsyncMethodWithResult(ct))
         /// This variant combines return value support with cancellation capabilities.
         /// </remarks>
         public static AsyncHandle<T> RunAsync<T>(this MonoBehaviour monoBehaviour, Expression<Func<CancellationToken, Task<T>>> methodExpression)
@@ -113,7 +113,7 @@ namespace ByteForge.Runtime
         /// </remarks>
         public static void HaltAsync<T>(this MonoBehaviour monoBehaviour, AsyncHandle<T> handle)
         {
-            AsyncSystem.Halt(new AsyncHandle(handle.Id, Task.CompletedTask));
+            AsyncSystem.Halt(new(handle.Id, Task.CompletedTask));
         }
 
         /// <summary>

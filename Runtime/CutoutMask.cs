@@ -13,7 +13,7 @@ namespace ByteForge.Runtime
     /// shows content everywhere except inside the mask area.
     /// 
     /// This works by modifying the stencil comparison function to NotEqual,
-    /// effectively inverting the behavior of the standard mask.
+    /// effectively inverting the behaviour of the standard mask.
     /// 
     /// Usage:
     /// 1. Add this component to a UI element
@@ -31,7 +31,7 @@ namespace ByteForge.Runtime
         /// <remarks>
         /// This property gets the base material from the Image component and
         /// modifies its stencil comparison function to NotEqual, which inverts
-        /// the standard masking behavior.
+        /// the standard masking behaviour.
         /// </remarks>
         public override Material materialForRendering
         {

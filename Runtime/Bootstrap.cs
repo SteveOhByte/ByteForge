@@ -17,7 +17,7 @@ namespace ByteForge.Runtime
         /// Initializes the ByteForge framework and any required subsystems.
         /// </summary>
         /// <remarks>
-        /// This method is automatically called by Unity during the SubsystemRegistration phase,
+        /// Unity automatically calls this method during the SubsystemRegistration phase,
         /// which occurs before scene loading. This is the earliest point at which code can be
         /// executed in the Unity runtime lifecycle, making it ideal for framework initialization.
         /// 

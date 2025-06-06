@@ -55,7 +55,7 @@ namespace ByteForge.Editor
         /// Whether the CSV is currently being saved.
         /// </summary>
         /// <remarks>
-        /// Used to prevent showing the unsaved changes dialog during save operations.
+        /// Used to prevent showing the unsaved changes dialogue during save operations.
         /// </remarks>
         private bool isSaving = false;
         
